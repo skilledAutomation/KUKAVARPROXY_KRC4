@@ -532,11 +532,12 @@ def toPythonDict(stringa):
 
 if __name__ == '__main__':
     kvp = KukaVarProxyClient(kukavarproxyIP, robotPort)
-    IPs = []
+    IPs = [[172,17,255,1],]
+    
     while len(IPs) < 1:
         print("discovering robots...")
         IPs = kvp.discoverRobots()
-
+    
     print("Found IPs:")
     for ip in IPs:
         print(f"{ip[0]}.{ip[1]}.{ip[2]}.{ip[3]}")
@@ -545,5 +546,33 @@ if __name__ == '__main__':
 
     stringa = kvp.readVar("$OV_PRO").decode()
     print(stringa)
+
+    
+    stringa = kvp.readVar("$POS_ACT").decode()
+    print(stringa)
+
+    stringa = kvp.readVar("$AXIS_ACT").decode()
+    print(stringa)
+
     stringa = stringa[stringa.index('{')+1: stringa.rindex('}') ]
     print("DEBUG: ", toPythonDict(stringa))
+
+    """
+    from robolink import *    # RoboDK API
+    from robodk import *      # Robot toolbox
+
+    RDK = Robolink()
+    rdk_robot = RDK.ItemUserPick('Select a robot',ITEM_TYPE_ROBOT)
+    rdk_available = rdk_robot.Valid()
+    if not rdk_robot.Valid():
+        print("RoboDK not available. Robot not selected or not valid")
+
+    rdk_robot.setSpeedJoints(100)
+    rdk_robot.setAccelerationJoints(100)
+    while True:
+        stringa = kvp.readVar("$AXIS_ACT").decode()
+        stringa = stringa[stringa.index('{')+1: stringa.rindex('}') ]
+        pos = toPythonDict(stringa)
+        
+        rdk_robot.MoveJ([pos['A1'], pos['A2'], pos['A3'], pos['A4'], pos['A5'], pos['A6']])
+    """ 
